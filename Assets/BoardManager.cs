@@ -165,6 +165,6 @@ public class BoardManager : MonoBehaviour
                 created++;
             }
         }
-        Debug.Log($"[BoardManager] Generated square board: Columns:{columns}, RowsPerSide:{rowsPerSide} (TotalRows:{totalRows}), Created:{created}");
+        //Debug.Log($"[BoardManager] Generated square board: Columns:{columns}, RowsPerSide:{rowsPerSide} (TotalRows:{totalRows}), Created:{created}");
     }
 }

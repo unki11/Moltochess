@@ -68,7 +68,7 @@ public class BoardCell : MonoBehaviour
         occupant = piece;
 
         // 배치 로그 출력 (인덱스와 월드 좌표)
-        Debug.Log($"[BoardCell] Placed piece at Team:{teamSide} X:{gridX} Y:{gridY} World:{transform.position}");
+        //Debug.Log($"[BoardCell] Placed piece at Team:{teamSide} X:{gridX} Y:{gridY} World:{transform.position}");
     }
 
     // 중요 함수 - 셀의 색상을 변경 (SpriteRenderer 필요)
@@ -85,8 +85,8 @@ public class BoardCell : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning($"[BoardCell] No SpriteRenderer found to apply color at Team:{teamSide} X:{gridX} Y:{gridY}");
+            //Debug.LogWarning($"[BoardCell] No SpriteRenderer found to apply color at Team:{teamSide} X:{gridX} Y:{gridY}");
         }
-        Debug.Log($"[BoardCell] Applied color {color} to Team:{teamSide} X:{gridX} Y:{gridY}");
+        //Debug.Log($"[BoardCell] Applied color {color} to Team:{teamSide} X:{gridX} Y:{gridY}");
     }
 }
