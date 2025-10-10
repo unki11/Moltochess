@@ -9,7 +9,7 @@ public class BenchManager : MonoBehaviour
     public int tileCount = 8;
     public float spacing = 1.5f;
 
-    private BenchTile[] tiles;
+    private BenchSlot[] tiles;
 
     private void Awake()
     {
@@ -27,22 +27,22 @@ public class BenchManager : MonoBehaviour
     void GenerateTiles()
     {
         Debug.Log($"타일 생성 시작, tileCount = {tileCount}");
-        tiles = new BenchTile[tileCount];
+        tiles = new BenchSlot[tileCount];
 
         for (int i = 0; i < tileCount; i++)
         {
             Debug.Log($"타일 생성 중: {i}");
             Vector3 pos = new Vector3(i * spacing - 5f, -3f, 0);
             GameObject tileObj = Instantiate(tilePrefab, pos, Quaternion.identity, tileParent);
-            tileObj.name = $"BenchTile_{i}";
+            tileObj.name = $"BenchSlot_{i}";
 
-            BenchTile tile = tileObj.GetComponent<BenchTile>();
+            BenchSlot tile = tileObj.GetComponent<BenchSlot>();
             tile.index = i;
             tiles[i] = tile;
         }
     }
 
-    public void OnTileClicked(BenchTile tile)
+    public void OnTileClicked(BenchSlot tile)
     {
         if (tile.currentUnit != null)
         {
@@ -59,14 +59,18 @@ public class BenchManager : MonoBehaviour
             t.SetHighlight(t == tile);
     }
 
-    public bool AddUnit(UnitBase unit)
+    public bool AddUnit(UnitData unit)
     {
         foreach (var tile in tiles)
         {
             if (tile.currentUnit == null)
             {
-                tile.currentUnit = unit;
-                unit.transform.position = tile.transform.position + Vector3.up * 0.5f; // 시각적으로 위에 배치
+                Vector2 spawnPos = new Vector2(-3f, 0f);
+                UnitBase currentUnit = GameManager.Instance.SpawnUnit(unit, spawnPos, true);
+                currentUnit.transform.SetParent(tile.transform);
+                currentUnit.transform.position = tile.transform.position; // 시각적으로 위에 배치
+                tile.currentUnit = currentUnit;
+                tile.isEmpty = false;
                 return true;
             }
         }
