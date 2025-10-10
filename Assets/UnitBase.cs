@@ -25,6 +25,11 @@ public class UnitBase : MonoBehaviour
 
     private SpriteRenderer spriteRenderer;
 
+    private RectTransform rectTransform;
+    private CanvasGroup canvasGroup;
+    private Vector2 originalPosition;
+    private Transform originalParent;
+
     public void Initialize(UnitData data, bool isPlayer = true)
     {
         // UnitData에서 정보를 복사
@@ -142,4 +147,7 @@ public class UnitBase : MonoBehaviour
     {
         
     }
+
+    
+
 }

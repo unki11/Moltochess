@@ -91,11 +91,7 @@ public class ShopSlot : MonoBehaviour, IPointerClickHandler
             return;
         }
         
-        // GameManager.cs 테스트와 유사한 기본 위치에 소환
-        
-        Vector2 spawnPos = new Vector2(-3f, 0f);
-        UnitBase unit = GameManager.Instance.SpawnUnit(currentUnit, spawnPos, true);
-        BenchManager.Instance.AddUnit(unit);
+        BenchManager.Instance.AddUnit(currentUnit);
         Debug.Log($"소환: {currentUnit.unitName}");
     }
     
