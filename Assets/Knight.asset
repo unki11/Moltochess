@@ -15,9 +15,11 @@ MonoBehaviour:
   unitID: A
   unitName: Knight
   cost: 1
-  maxHealth: 100
-  attack: 10
+  maxHealth: 300
+  currentHealth: 0
+  attack: 20
   attackRate: 1
-  moveSpeed: 1
+  moveSpeed: 2
   icon: {fileID: -5711848221618334454, guid: 8196a1ef445233742952d3cba6058828, type: 3}
+  attackRange: 2
   unitSprite: {fileID: -5711848221618334454, guid: 8196a1ef445233742952d3cba6058828, type: 3}

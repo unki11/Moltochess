@@ -29,6 +29,12 @@ public class DraggableUnit : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     /// </summary>
     public void OnBeginDrag(PointerEventData eventData)
     {
+        // 1. 드래그 시작 시 BattleManager에 이 유닛을 '드래그 중'으로 등록합니다.
+        UnitBase unitComponent = GetComponent<UnitBase>();
+        if (unitComponent != null)
+        {
+            GameManager.Instance.currentDraggedUnit = unitComponent;
+        }
 
         if(spriteRenderer == null || objectCollider == null || mainCamera == null)
         {
@@ -75,6 +81,18 @@ public class DraggableUnit : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
         spriteRenderer.sortingOrder = originalSortingOrder;
         objectCollider.enabled = true;
 
+        // 2. 드래그 종료 시 참조를 해제합니다.
+        GameManager.Instance.currentDraggedUnit = null;
+
+        bool isSold = ShopManager.Instance.TrySellUnit(this.gameObject, eventData.position);
+        
+        if (isSold)
+        {
+            // 판매에 성공하면 이 오브젝트는 파괴되거나 비활성화됩니다.
+            Debug.Log($"{gameObject.name}이(가) 판매되었습니다.");
+            return;
+        }
+
         // 2. 드롭 위치에 어떤 오브젝트가 있는지 확인
         Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         RaycastHit2D[] hits = Physics2D.RaycastAll(mousePos, Vector2.zero);
@@ -95,8 +113,6 @@ public class DraggableUnit : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
                 Debug.Log($"{benchSlot} benchSlot 시작");
                 HandleBenchDrop(benchSlot);
                 break;
-
-            }else{
 
             }
 
@@ -178,12 +194,12 @@ public class DraggableUnit : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
             transform.SetParent(boardSlot.transform);
             transform.position = boardSlot.transform.position; 
             
-            Debug.Log("BoardSlot 유닛을(를) 보드로 배치");
+            Debug.Log("boardSlot 유닛을(를) 보드로 배치");
         }
         else
         {
             // 찬 슬롯 → 교환
-            UnitBase tempUnit = boardSlot.currentUnit;
+            UnitBase tempUnit = boardSlot.unitBase;
             boardSlot.SetUnit(GetComponent<UnitBase>());
             SetOriginalSlotUnit(tempUnit);
             transform.SetParent(boardSlot.transform);
@@ -191,7 +207,7 @@ public class DraggableUnit : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
             tempUnit.transform.SetParent(originalParent.transform);
             tempUnit.transform.position = originalParent.transform.position;
             
-            Debug.Log("BoardSlot 유닛교환");
+            Debug.Log("boardSlot 유닛교환");
         }
     }
     

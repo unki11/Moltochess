@@ -24,7 +24,7 @@ public class BoardManager : MonoBehaviour
     public static BoardManager Instance;
 
     [Header("Prefabs")]
-    public GameObject boardCellPrefab;   // 셀 프리팹 (BoardCell 포함된 오브젝트)
+    public GameObject boardCellPrefab;   // 셀 프리팹 (BoardSlot 포함된 오브젝트)
 
     [Header("Board Size (Columns x Rows per side)")]
     public int columns = 8;              // 가로 8칸
@@ -61,9 +61,9 @@ public class BoardManager : MonoBehaviour
         }
         else
         {
-            var hasCell = boardCellPrefab.GetComponent<BoardCell>() != null;
+            var hasCell = boardCellPrefab.GetComponent<BoardSlot>() != null;
             var hasRenderer = boardCellPrefab.GetComponentInChildren<SpriteRenderer>() != null;
-            Debug.Log($"[BoardManager] Prefab assigned: {boardCellPrefab.name}, Has BoardCell: {hasCell}, Has SpriteRenderer: {hasRenderer}");
+            Debug.Log($"[BoardManager] Prefab assigned: {boardCellPrefab.name}, Has BoardSlot: {hasCell}, Has SpriteRenderer: {hasRenderer}");
         }
         GenerateBoard();
     }
@@ -116,16 +116,16 @@ public class BoardManager : MonoBehaviour
                 Vector3 pos = origin + new Vector3(x * stride, y * stride, 0f);
                 var go = Instantiate(boardCellPrefab, pos, Quaternion.identity, transform);
 
-                var cell = go.GetComponent<BoardCell>();
+                var cell = go.GetComponent<BoardSlot>();
                 if (cell == null)
                 {
-                    cell = go.GetComponentInChildren<BoardCell>();
+                    cell = go.GetComponentInChildren<BoardSlot>();
                 }
                 if (cell != null)
                 {
                     // y 기준으로 위 절반은 Enemy, 아래 절반은 Ally (원래 방식)
-                    bool isEnemy = y < rowsPerSide;
-                    cell.teamSide = isEnemy ? BoardCell.TeamSide.Enemy : BoardCell.TeamSide.Ally;
+                    bool isEnemy = y >= rowsPerSide;
+                    cell.teamSide = isEnemy ? BoardSlot.TeamSide.Enemy : BoardSlot.TeamSide.Ally;
 
                     // 팀별 로컬 인덱스 (원래 방식)
                     int localY = isEnemy ? (rowsPerSide - 1 - y) : (y - rowsPerSide);
@@ -141,14 +141,20 @@ public class BoardManager : MonoBehaviour
                     Color light = Color.white;
                     Color dark = new Color(0.7f, 0.7f, 0.7f, 1f);
                     cell.ApplyColor(isLight ? light : dark);
+
+                    if (isEnemy == true){
+                        BattleManager.Instance.enemyCells.Add(cell);
+                    }else{
+                        BattleManager.Instance.allyCells.Add(cell);
+                    }
                 }
                 else
                 {
                     // 런타임에 BoardCell이 없으면 자동으로 추가하여 색상/인덱스가 적용되도록 처리
-                    cell = go.AddComponent<BoardCell>();
+                    cell = go.AddComponent<BoardSlot>();
                     // 기본값 설정 후 동일 로직 적용
-                    bool isEnemy = y < rowsPerSide;
-                    cell.teamSide = isEnemy ? BoardCell.TeamSide.Enemy : BoardCell.TeamSide.Ally;
+                    bool isEnemy = y >= rowsPerSide;
+                    cell.teamSide = isEnemy ? BoardSlot.TeamSide.Enemy : BoardSlot.TeamSide.Ally;
                     int localY = isEnemy ? (rowsPerSide - 1 - y) : (y - rowsPerSide);
                     cell.gridX = x;
                     cell.gridY = localY;

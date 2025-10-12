@@ -33,6 +33,8 @@ public class GameManager : MonoBehaviour {
     [Header("유닛 데이터")]
     public UnitData knightData;
     public UnitData armorData;
+
+    public UnitBase currentDraggedUnit { get; internal set; } = null;
     
     // 싱글톤 패턴
     void Awake() {  // Unity 내부 함수 - 오브젝트 생성 시 가장 먼저 실행
@@ -51,28 +53,70 @@ public class GameManager : MonoBehaviour {
     void Update()
     {
         // Space 키로 Knight 소환 테스트
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.E))
         {
-            SpawnKnight(new Vector2(-2, 0), true);
+            TrySellWorldUnitAtMousePosition();
         }
         
         // A 키로 Armor 소환 테스트
-        if (Input.GetKeyDown(KeyCode.A))
+        if (Input.GetKeyDown(KeyCode.D))
         {
-            SpawnArmor(new Vector2(2, 0), false);
+            ShopManager.Instance.RefreshShop();
         }
-        
-        // K 키로 ID를 이용한 Knight 소환 테스트
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            BattleManager.Instance.StartBattle();
+        }
+
         if (Input.GetKeyDown(KeyCode.K))
         {
-            SpawnUnitById("knight", new Vector2(-3, 0), true);
+            if (UIManager.Instance != null)
+            {
+                UIManager.Instance.ShowRoundResult(true);
+            }
         }
-        
-        // R 키로 ID를 이용한 Armor 소환 테스트
-        if (Input.GetKeyDown(KeyCode.R))
+
+    }
+
+    private void TrySellWorldUnitAtMousePosition()
+    {
+        // 1. 메인 카메라를 통해 마우스 위치에서 월드 공간으로 레이를 생성합니다.
+        Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        RaycastHit2D[] hits = Physics2D.RaycastAll(mousePos, Vector2.zero);
+
+        UnitBase unitToSell = GameManager.Instance.currentDraggedUnit;
+        if (unitToSell != null)
         {
-            SpawnUnitById("armor", new Vector2(3, 0), false);
-        }
+            ShopManager.Instance.PerformSell(unitToSell);
+        } else if(hits != null){
+            foreach(var hit in hits)
+            {
+                Debug.Log("ㅡㅡㅡㅡㅡㅡㅡㅡ!!!!!!!!!!! : " + hit.collider.gameObject.name); 
+                if(hit.collider.GetComponent<UnitBase>() != null)
+                {
+                    UnitBase unitBase = hit.collider.GetComponent<UnitBase>();
+                    Debug.Log($"{unitBase} boardSlot 시작");
+                    ShopManager.Instance.PerformSell(unitBase);
+                    break;
+
+                }
+            }
+        } else 
+        {
+            Debug.Log("E 키가 눌렸으나 마우스 아래에 판매할 월드 유닛이 없습니다.");
+        }        
+        
+    }
+
+    public void OnBattleStartButtonClicked()
+    {
+        BattleManager.Instance.StartBattle();
+    }
+
+    public void onRerollButtonClicked()
+    {
+        ShopManager.Instance.RefreshShop();
     }
 
     public UnitBase SpawnUnit(UnitData data, Vector2 position, bool isPlayer)

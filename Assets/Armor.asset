@@ -15,9 +15,11 @@ MonoBehaviour:
   unitID: C
   unitName: Warrior
   cost: 3
-  maxHealth: 5000
+  maxHealth: 500
+  currentHealth: 0
   attack: 5
   attackRate: 1
   moveSpeed: 1
   icon: {fileID: -2757887451555568444, guid: dc560a50399ac9044a774abf798e4205, type: 3}
+  attackRange: 1
   unitSprite: {fileID: -2757887451555568444, guid: dc560a50399ac9044a774abf798e4205, type: 3}

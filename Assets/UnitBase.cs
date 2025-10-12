@@ -11,6 +11,10 @@ public class UnitBase : MonoBehaviour
     public float attackRate;            // 초당 공격 수
     public float moveSpeed;             // 이동 속도
     public Sprite unitSprite;           // 유닛 스프라이트
+
+    public float attackRange;
+
+    public UnitData unitData;
     
     [Header("현재 상태")]
     public int currentHealth;           // 현재 체력
@@ -37,10 +41,13 @@ public class UnitBase : MonoBehaviour
         unitName = data.unitName;
         cost = data.cost;
         maxHealth = data.maxHealth;
+        currentHealth = data.currentHealth;
         attack = data.attack;
         attackRate = data.attackRate;
         moveSpeed = data.moveSpeed;
         unitSprite = data.unitSprite;
+        attackRange = data.attackRange;
+        unitData = data;
         
         isPlayerUnit = isPlayer;
         
@@ -70,6 +77,14 @@ public class UnitBase : MonoBehaviour
         // 이름 설정 (디버깅용)
         gameObject.name = unitName;
     }
+
+    public void MoveTowards(Vector2 targetPosition)
+    {
+        if (!isAlive) return;
+        
+        Vector2 direction = (targetPosition - (Vector2)transform.position).normalized;
+        transform.position += (Vector3)direction * moveSpeed * Time.deltaTime;
+    }
     
     public void TakeDamage(int damage)
     {
@@ -87,6 +102,28 @@ public class UnitBase : MonoBehaviour
         Debug.Log($"{unitName} 체력: {currentHealth}/{maxHealth}");
     }
 
+    public void Attack(UnitBase target)
+    {
+        if (!isAlive || target == null || !target.isAlive) return;
+        
+        // 쿨타임 체크
+        if (attackTimer > 0) return;
+        
+        // 사거리 체크
+        float distance = Vector2.Distance(transform.position, target.transform.position);
+        if (distance > attackRange) return;
+        
+        // 공격 실행
+        target.TakeDamage(attack);
+        
+        // 쿨타임 설정
+        attackTimer = 1f / attackRate;
+        
+        currentTarget = target;
+        
+        Debug.Log($"{unitName}이(가) {target.unitName}을(를) 공격! (데미지: {attack})");
+    }
+
     private void Die()
     {
         isAlive = false;
@@ -94,26 +131,45 @@ public class UnitBase : MonoBehaviour
         
         Debug.Log($"{unitName} 사망!");
         
-        // 비주얼 효과 (투명도 조절)
+        // 투명도 조절 (시각적 표시)
         if (spriteRenderer != null)
         {
             Color color = spriteRenderer.color;
             color.a = 0.3f;
             spriteRenderer.color = color;
         }
-        else
-        {
-            Debug.LogWarning("spriteRenderer가 null입니다. 비주얼 효과를 적용할 수 없습니다.");
-        }
-        
-        // 나중에 사망 애니메이션이나 이펙트 추가 가능
     }
 
+    public void ResetState()
+    {
+        // 유닛 상태 초기화
+        isAlive = true; // 생존 상태로 변경
+        // currentHealth = maxHealth; // 필요하다면 체력도 초기화
+        // currentTarget = null;
+        
+        // ⭐ 투명도 복원 ⭐
+        if (spriteRenderer != null)
+        {
+            Color color = spriteRenderer.color;
+            // Alpha 값을 1.0f (완전히 불투명)로 설정
+            color.a = 1.0f; 
+            spriteRenderer.color = color;
+        }
+
+        Debug.Log($"{unitName} 상태 복원 및 투명도 초기화 완료.");
+    }
+    
+    /// <summary>
+    /// 유닛 제거
+    /// </summary>
     public void RemoveUnit()
     {
         Destroy(gameObject);
     }
-
+    
+    /// <summary>
+    /// 유닛 정보 문자열 반환 (디버깅용)
+    /// </summary>
     public string GetUnitInfo()
     {
         return $"[{unitName}] HP: {currentHealth}/{maxHealth} | ATK: {attack} | Cost: {cost}";
@@ -145,7 +201,13 @@ public class UnitBase : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!isAlive) return;
         
+        // 공격 쿨타임 감소
+        if (attackTimer > 0)
+        {
+            attackTimer -= Time.deltaTime;
+        }
     }
 
     
