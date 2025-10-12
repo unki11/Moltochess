@@ -10,13 +10,10 @@ public class ShopSlot : MonoBehaviour, IPointerClickHandler
     public TextMeshProUGUI  unitNameText;           // 유닛 이름
     public TextMeshProUGUI  unitCostText;           // 유닛 비용    
     private UnitData currentUnit;
-    private ShopManager shopManager;
-    
+
     void Awake()
     {
-        // ShopManager 찾기
-        shopManager = FindObjectOfType<ShopManager>();
-    
+
     }
     
     /// <summary>
