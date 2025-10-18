@@ -100,6 +100,10 @@ public class ShopManager : MonoBehaviour
     public void RefreshShop()
     {
         Debug.Log("--- RefreshShop() 실행 시작 ---");
+
+        PlayerData player = PlayerData.Instance;
+        player.SpendGold(player.shopRefreshCost);
+
         currentShopUnits.Clear();
         
         // 랜덤하게 유닛 3개 선택
