@@ -11,7 +11,7 @@ public class PlayerManager : MonoBehaviour
     public int loseStreak = 0;
 
     // 유닛 관리
-    public List<string> benchUnits = new List<string>(); //유닛으로 변경 예정
+    public List<UnitData> benchUnits = new List<UnitData>(); //유닛으로 변경 예정
     public List<string> boardUnits = new List<string>(); //유닛으로 변경 예정
     public int maxBoardSize = 8; //최대 보드 크기
     public int maxBenchSize = 9; //최대 벤치 크기

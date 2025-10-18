@@ -296,7 +296,7 @@ public class BattleManager : MonoBehaviour
         
         if ((allyDefeated || enemyDefeated) && isInBattle)
         {
-            StartCoroutine( EndBattle(2.0f,enemyDefeated));
+            StartCoroutine( EndBattle(3.0f,enemyDefeated));
            
         }
     }
@@ -316,6 +316,7 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
+            PlayerData.Instance.TakeDamage();
             Debug.Log("💀 아군 패배!");
         }
 

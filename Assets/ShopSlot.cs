@@ -22,9 +22,7 @@ public class ShopSlot : MonoBehaviour, IPointerClickHandler
     public void SetUnit(UnitData unitData)
     {
         currentUnit = unitData;
-        
-        Debug.Log($"SetUnit 호출: {unitData.unitName}");
-        
+                
         // 유닛 아이콘
         if (unitIconImage != null)
         {
@@ -47,7 +45,6 @@ public class ShopSlot : MonoBehaviour, IPointerClickHandler
         if (unitNameText != null)
         {
             unitNameText.text = unitData.unitName;
-            Debug.Log($"이름 설정: {unitData.unitName}");
         }
         else
         {
@@ -58,7 +55,6 @@ public class ShopSlot : MonoBehaviour, IPointerClickHandler
         if (unitCostText != null)
         {
             unitCostText.text = $"{unitData.cost}G";
-            Debug.Log($"비용 설정: {unitData.cost}G");
         }
         else
         {

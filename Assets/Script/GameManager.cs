@@ -12,8 +12,8 @@ public class GameManager : MonoBehaviour {
     
     // 타이머 설정 (Inspector에서 조절 가능)
     [Header("Phase Durations")]
-    public float shoppingDuration = 30f;
-    public float battleDuration = 30f;
+    public float shoppingDuration = 10f;
+    public float battleDuration = 10f;
     
     // 현재 상태
     [Header("Game Info")]
@@ -58,10 +58,15 @@ public class GameManager : MonoBehaviour {
             TrySellWorldUnitAtMousePosition();
         }
         
-        // A 키로 Armor 소환 테스트
+        
         if (Input.GetKeyDown(KeyCode.D))
         {
             ShopManager.Instance.RefreshShop();
+        }
+
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            PlayerData.Instance.AddExp(PlayerData.Instance.shopExpCost);
         }
 
         if (Input.GetKeyDown(KeyCode.Space))
@@ -210,6 +215,8 @@ public class GameManager : MonoBehaviour {
             yield return StartBattlePhase();    // 전투 페이즈 완료까지 대기
             currentRound++;
             OnRoundChange.Invoke(currentRound);
+
+            Debug.Log("GameLoop : " + currentRound);
         }
     }
     
@@ -242,7 +249,7 @@ public class GameManager : MonoBehaviour {
             yield return new WaitForSeconds(0.1f);
             remainingTime -= 0.1f;
             OnTimerUpdate.Invoke(remainingTime);
-            
+
             // 전투가 일찍 끝나면 페이즈 종료
             if (IsBattleFinished()) {
                 break;

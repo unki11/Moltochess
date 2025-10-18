@@ -15,6 +15,17 @@ public class UIManager : MonoBehaviour
     // ⭐ UnityEngine.UI.Text 대신 TMPro.TextMeshProUGUI 사용
     public TextMeshProUGUI resultText; // 결과 문구가 표시될 TextMeshPro 컴포넌트
     // ----------------------------------------------------------------------
+    public TextMeshProUGUI gameRoundText;
+
+    public TextMeshProUGUI roundText;
+    public GameObject roundResultPanel;
+
+    [Header("UI 컴포넌트 (TextMeshPro)")]
+    public TextMeshProUGUI healthTextTMP;
+    public TextMeshProUGUI goldTextTMP;
+    public TextMeshProUGUI levelTextTMP;
+
+    public TextMeshProUGUI expTextTMP;
 
     // 페이드 인/아웃 속도
     private float fadeDuration = 0.5f; 
@@ -35,6 +46,27 @@ public class UIManager : MonoBehaviour
         // C. (선택 사항) 씬이 바뀌어도 파괴되지 않게 하려면 추가합니다.
         // DontDestroyOnLoad(gameObject); 
 
+        // 1. GameManager가 초기화될 때까지 기다립니다.
+        // GameManager가 먼저 Awake에서 Instance를 설정했다고 가정합니다.
+        
+        // 2. GameManager의 이벤트에 UI 업데이트 함수들을 등록합니다.
+        if (GameManager.Instance != null)
+        {
+            // OnRoundChange 이벤트 (int 매개변수) 구독
+            GameManager.Instance.OnRoundChange.AddListener(UpdateRoundUI);
+            
+            
+            // OnShoppingStart 이벤트 (매개변수 없음) 구독
+            GameManager.Instance.OnShoppingStart.AddListener(OnShoppingStart);
+            
+            // OnBattleStart 이벤트 (매개변수 없음) 구독
+            GameManager.Instance.OnBattleStart.AddListener(OnBattleStart);
+        }
+        else
+        {
+            Debug.LogError("GameManager 인스턴스를 찾을 수 없습니다. 이벤트 구독 실패!");
+        }
+
         Debug.Log("UIManager 싱글톤 인스턴스 초기화 완료.");
     }
 
@@ -54,6 +86,68 @@ public class UIManager : MonoBehaviour
                 HideRoundResult(); 
             }
         }
+
+        UpdateUI();
+    }
+    
+    void UpdateUI()
+    {
+        PlayerData player = PlayerData.Instance;
+        if (player == null) return;
+        
+        GameManager game = GameManager.Instance;
+        
+        // TextMeshPro 업데이트
+        if (healthTextTMP != null)
+            healthTextTMP.text = $"HP: {player.playerHealth}";
+        
+        if (goldTextTMP != null)
+            goldTextTMP.text = $"Gold: {player.playerGold}G";
+        
+        if (levelTextTMP != null)
+            levelTextTMP.text = $"Level: {player.level}";
+
+            if (expTextTMP != null)
+            expTextTMP.text = $"exp: {player.exp}";
+    }
+
+    void Start()
+    {
+        
+    }
+
+    public void UpdateRoundUI(int round)
+    {
+        if (roundText != null && gameRoundText != null)
+        {
+            roundText.text = $"Round: {round}";
+            Debug.Log($"UI 업데이트: 현재 라운드 {round}");
+
+            string phaseName = GameManager.Instance.currentState.ToString();
+
+            gameRoundText.text = phaseName;
+            Debug.Log($"UI 업데이트: 게임 라운드 {phaseName}");
+        }
+        else
+        {
+            Debug.Log($"roundText와 gameRoundText가 없습니다.");
+        }
+    }
+    
+    // UnityEvent<float> (타이머)에 연결될 함수
+    
+    // UnityEvent (매개변수 없음)에 연결될 함수 (예시)
+    public void OnShoppingStart()
+    {
+        Debug.Log("UI: 상점 페이즈 UI를 준비합니다.");
+        // 상점 관련 UI 활성화/전투 UI 비활성화 등의 로직
+    }
+
+    // UnityEvent (매개변수 없음)에 연결될 함수 (예시)
+    public void OnBattleStart()
+    {
+        Debug.Log("UI: 전투 페이즈 UI를 준비합니다.");
+        // 전투 관련 UI 활성화/상점 UI 비활성화 등의 로직
     }
     
     // ⭐ 결과 창을 숨기는 새로운 함수
